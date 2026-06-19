@@ -5,7 +5,7 @@ pipeline {
         APP_HOST   = "ubuntu@192.168.56.105"
         APP_IP     = "192.168.56.105"
         DEPLOY_DIR = "/home/ubuntu/todoapp"
-        COMPOSE    = "docker-compose -p mytodoapp"   // use 'docker compose' if v2
+        COMPOSE    = "docker compose -p mytodoapp"   // use 'docker compose' if v2
     }
 
     stages {
