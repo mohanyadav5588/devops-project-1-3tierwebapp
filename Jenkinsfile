@@ -5,10 +5,8 @@ pipeline {
         APP_HOST   = "ubuntu@192.168.56.105"
         APP_IP     = "192.168.56.105"
         DEPLOY_DIR = "/home/ubuntu/todoapp"
-        COMPOSE    = "docker-compose -p mytodoapp"
+        COMPOSE    = "docker-compose -p mytodoapp"   // use 'docker compose' if v2
     }
-
-    
 
     stages {
         stage('Checkout') {
@@ -23,21 +21,19 @@ pipeline {
                 '''
             }
         }
-     
+
         stage('Deploy to app server') {
             steps {
                 sshagent(['app-server-ssh']) {
-                    // 1. push the code
                     sh '''
                         ssh -o StrictHostKeyChecking=no ${APP_HOST} "mkdir -p ${DEPLOY_DIR}"
                         rsync -az --delete --exclude venv --exclude .git \
+                            -e "ssh -o StrictHostKeyChecking=no" \
                             ./ ${APP_HOST}:${DEPLOY_DIR}/
                     '''
-                    // 2. push the real .env (stored as a Jenkins secret file)
                     withCredentials([file(credentialsId: 'todo-env', variable: 'ENV_FILE')]) {
                         sh 'scp -o StrictHostKeyChecking=no "$ENV_FILE" ${APP_HOST}:${DEPLOY_DIR}/.env'
                     }
-                    // 3. build + run everything on the app server
                     sh '''
                         ssh -o StrictHostKeyChecking=no ${APP_HOST} "
                             cd ${DEPLOY_DIR} &&
@@ -52,7 +48,7 @@ pipeline {
         stage('Smoke test') {
             steps {
                 sh '''
-                    sleep 8
+                    sleep 20
                     code=$(curl -s -o /dev/null -w "%{http_code}" http://${APP_IP}/)
                     echo "Homepage returned HTTP $code"
                     test "$code" = "200"
