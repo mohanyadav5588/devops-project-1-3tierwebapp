@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        APP_HOST   = "ubuntu@192.168.56.102"
+        APP_HOST   = "lab@192.168.56.102"
         APP_IP     = "192.168.56.102"
-        DEPLOY_DIR = "/home/ubuntu/todoapp"
+        DEPLOY_DIR = "/home/lab/todoapp"
         COMPOSE    = "docker compose -p mytodoapp"   // use 'docker compose' if v2
     }
 
