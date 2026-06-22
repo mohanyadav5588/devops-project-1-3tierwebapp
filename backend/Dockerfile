@@ -6,9 +6,10 @@ WORKDIR /app
 
 #RUN apt-get update && apt-get install -y libpq-dev --no-install-recommends build-essential
 # Install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev build-essential && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+apt-get install -y --no-install-recommends \
+libpq-dev build-essential && \
+rm -rf /var/lib/apt/lists/*
 
 # Copy the current directory contents into the container at /app
 COPY . /app
