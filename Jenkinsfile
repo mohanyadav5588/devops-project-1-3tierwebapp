@@ -22,9 +22,9 @@ pipeline {
             }
         }
 
-        stage('app-server-ssh') {
+        stage('deploy to app server') {
             steps {
-                sshagent(['jenkins']) {
+                sshagent(['app-server-ssh']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ${APP_HOST} "mkdir -p ${DEPLOY_DIR}"
                         rsync -az --delete --exclude venv --exclude .git \
