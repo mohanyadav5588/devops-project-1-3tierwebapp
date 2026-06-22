@@ -22,7 +22,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to app server') {
+        stage('app-server-ssh') {
             steps {
                 sshagent(['jenkins']) {
                     sh '''
