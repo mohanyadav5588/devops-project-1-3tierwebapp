@@ -6,6 +6,10 @@ pipeline {
         APP_IP     = "192.168.56.102"
         DEPLOY_DIR = "/home/lab/todoapp"
         COMPOSE    = "docker compose -p mytodoapp"   // use 'docker compose' if v2
+    } 
+    // Add this triggers block to listen for git webhooks
+    triggers {
+        githubPush() // Use upstream() or gitlab() if not using GitHub
     }
 
     stages {
