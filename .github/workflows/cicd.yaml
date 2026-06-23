@@ -1,3 +1,16 @@
+
+name: Deploy Todo App
+
+on:
+  push:
+    branches: [ "main" ] # Triggers on push like githubPush()
+ 
+env:
+  APP_HOST: ${{ secrets.APP_HOST }}
+  APP_IP: ${{ secrets.APP_IP }}
+  DEPLOY_DIR: ${{ secrets.DEPLOY_DIR }}
+  COMPOSE: ${{ secrets.COMPOSE }}
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -54,3 +67,4 @@ jobs:
       - name: Notify Failure
         if: failure()
         run: echo "Failed — check the stage logs above"
+
