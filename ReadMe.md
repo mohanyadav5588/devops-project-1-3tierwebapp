@@ -174,7 +174,7 @@ docker-compose -p mytodoapp up --scale database=3 -d
 docker ps
 ```
 
-### View Logs
+### View Logs of compose
 
 ```bash
 docker-compose logs -f
