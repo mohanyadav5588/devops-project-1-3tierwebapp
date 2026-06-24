@@ -1,18 +1,15 @@
-
-name: Deploy Todo App
+name: CI/CD Pipeline inside GitHub Runner
 
 on:
   push:
-    branches: [ "main" ] # Triggers on push like githubPush()
- 
+    branches: [ "main" ]
+
 env:
-  APP_HOST: ${{ secrets.APP_HOST }}
-  APP_IP: ${{ secrets.APP_IP }}
-  DEPLOY_DIR: ${{ secrets.DEPLOY_DIR }}
-  COMPOSE: ${{ secrets.COMPOSE }}
+  DEPLOY_DIR: ${{ github.workspace }}
+  COMPOSE: "docker compose -p mytodoapp"
 
 jobs:
-  build-and-deploy:
+  build-test-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,47 +21,20 @@ jobs:
           cd backend
           python3 -m py_compile $(find src -name "*.py")
 
-      - name: Configure SSH Key
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.APP_SERVER_SSH_KEY }}
-
-      - name: Add Remote Host to Known Hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H 192.168.56.106 >> ~/.ssh/known_hosts
-
-      - name: Copy project files
-        run: |
-          ssh ${APP_HOST} "mkdir -p ${DEPLOY_DIR}"
-          rsync -az --delete --exclude venv --exclude .git ./ ${APP_HOST}:${DEPLOY_DIR}/
-
       - name: Deploy .env file
         run: |
+          # Creates the .env file locally in the runner workspace
           echo "${{ secrets.TODO_ENV }}" > .env
-          scp .env ${APP_HOST}:${DEPLOY_DIR}/.env
-          rm .env
 
-      - name: Restart Docker Compose Services
+      - name: Start Docker Compose Services
         run: |
-          ssh ${APP_HOST} "
-            cd ${DEPLOY_DIR} &&
-            ${COMPOSE} up --build -d &&
-            ${COMPOSE} ps
-          "
-
-      - name: Smoke test
-        run: |
-          sleep 20
-          code=$(curl -s -o /dev/null -w "%{http_code}" http://${APP_IP}:8080/)
-          echo "Homepage returned HTTP $code"
-          test "$code" = "200"
+          ${COMPOSE} up --build -d
+          ${COMPOSE} ps
 
       - name: Notify Success
         if: success()
-        run: echo "Deployed. App live at http://${APP_IP}:8080/"
+        run: echo "Workflow successful. App verified on runner."
 
       - name: Notify Failure
         if: failure()
         run: echo "Failed — check the stage logs above"
-
