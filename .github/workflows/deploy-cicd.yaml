@@ -35,7 +35,7 @@ jobs:
 
       - name: Copy project files
         run: |
-          ssh ${APP_HOST} "mkdir -p ${DEPLOY_DIR}"
+          ssh ubuntu@${APP_HOST} "mkdir -p ${DEPLOY_DIR}"
           rsync -az --delete --exclude venv --exclude .git ./ ${APP_HOST}:${DEPLOY_DIR}/
 
       - name: Deploy .env file
